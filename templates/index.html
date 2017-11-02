@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/dist/css/bootstrap.css">
+    <script src=" /static/dist/js/jquery-1.12.4.js"></script>
+</head>
+<body>
+<div class="container">
+    <hr>
+    <div class="row">
+        <form method="POST">
+            {% csrf_token %}
+            <div>
+                <p>调查问卷名称</p>
+
+                <input type="text" name="title" id="" class="form-control">
+            </div>
+            <div class="option_list" style="margin-top: 40px;">
+                <p>调查问题</p>
+                <input type="text" class="form-control question" name="question" id="">
+                <p>问题类型</p>
+
+                <select name="type_list" class="form-control type_list selecter">
+
+
+                </select>
+                <input type="button" class="kk" value="增加" class="btn-primary btn del hide">
+            </div>
+            <div style="margin-top: 20px;">
+                <hr>
+                <input type="button" id="sure" value="添加调查问卷" class="btn-primary btn button_list"> |
+                <input type="submit" name="" id="" value="生成调查问卷" class="btn-primary btn ">
+                <input type="button" id="sure" value="删除" class="btn-primary btn del hide">
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+<script>
+        (function () {
+            var $option=$('<option>')
+            $option.text('请选择')
+            $('#selecter').append($option)
+        })()
+
+
+        $("#sure").click(function () {
+            var copyl=$(this).parent().prev().clone()
+            copyl.find('.kkkk').remove()
+            $(this).parent().before(copyl);
+
+            $(this).next().next().removeClass('hide')
+        });
+
+
+        $('.del').click(function () {
+            $(this).parent().prev().remove();
+            $(this).addClass('hide')
+        });
+
+
+        $(function () {
+            $.ajax({
+                url:'/add/',
+                type:'GET',
+                data:{},
+                success:function (response) {
+{#                    alert(234234)#}
+{#                    console.log(response.status_choices);#}
+                    initselect(response.status_choices)
+                }
+            })
+        });
+
+        function initselect(choice_dict) {
+            $.each(choice_dict,function (name,values) {
+                var $option=$('<option>');
+                $option.text(values[1]);
+                $option.val(values[0]);
+                $('.selecter').append($option);
+            })
+
+        }
+
+        $('.row').on('change','.selecter',function () {
+            var $values=$('.selecter option:selected').val();
+                alert($values)
+            if ($values=='score'){
+                var $ul=$('<ul>');
+                var $li=$('<li>');
+                var $input=$('<input>');
+                var $input2=$('<input>');
+                $input.attr('type','text');
+                $li.append('内容:').append($input);
+                $li.append('分值:').append($input2);
+                $ul.append($li);
+                $(this).after($ul)
+
+            }
+
+
+        });
+
+{#        $('.row').on('click','.kk',function () {#}
+{#                console.log($(this).prev().val())#}
+{#            if ($(this).prev().val()=='single'){#}
+{#                var $ul=$('<ul>');#}
+{#                $ul.attr('class','kkkk')#}
+{##}
+{#                var $li=$('<li>');#}
+{#                var $input=$('<input>');#}
+{#                var $input2=$('<input>');#}
+{#                $input.attr('type','text');#}
+{#                $li.append('内容').append($input);#}
+{#                $li.append('分值').append($input2);#}
+{#                $ul.append($li);#}
+{#                $(this).after($ul)#}
+{#            }#}
+{#            else if($(this).prev().val()=='score'){#}
+{##}
+{#                var $ul=$('<ul>');#}
+{#                $ul.attr('class','kkkk')#}
+{#                var $li=$('<li>');#}
+{#                var $input=$('<input>');#}
+{#                $input.attr('type','text');#}
+{#                $li.append('分值').append($input);#}
+{#                $ul.append($li);#}
+{#                $(this).after($ul)#}
+{#            }#}
+{#        })#}
+
+
+
+</script>
+
+
+
+</body>
+</html>
