@@ -6,35 +6,63 @@
     <title>Title</title>
     <link rel="stylesheet" href="/static/dist/css/bootstrap.css">
     <script src=" /static/dist/js/jquery-1.12.4.js"></script>
+    <link rel="stylesheet" href="/static/dist/cssk/form-control.css">
 </head>
 <body>
 <div class="container">
     <hr>
-    <div class="row">
-        <form method="POST">
-            {% csrf_token %}
-            <div>
-                <p>调查问卷名称</p>
+{#    <div class="row col-sm-offset-1 single-option" hidden style="margin-top: 15px">#}
 
-                <input type="text" name="title" id="" class="form-control">
-            </div>
-            <div class="option_list" style="margin-top: 40px;">
+        <ul class="row col-sm-offset-1 single-option" hidden style="margin-top: 15px">
+            <li><label>内容：</label><input type="text" name="single" >&emsp;
+                <label>得分：</label><input type="number" name="score">
+{#                <input type="button" class="buttons" value="x">#}
+                <span class="buttons">x<i class="fa fa-times" aria-hidden="true"></i></span>
+            </li>
+        </ul>
+{#    </div>#}
+        <div class="row">
+            <div class="option_list " hidden style="margin-top: 40px;">
                 <p>调查问题</p>
                 <input type="text" class="form-control question" name="question" id="">
                 <p>问题类型</p>
 
-                <select name="type_list" class="form-control type_list selecter">
+                <select name="answer_type" class="form-control type_list selecter">
 
 
                 </select>
                 <input type="button" class="kk" value="增加" class="btn-primary btn del hide">
             </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div>
+                    <p>调查问卷名称</p>
+
+                    <input type="text" name="title" id="" class="form-control">
+            </div>
+
+            <div class="option_list" style="margin-top: 40px;">
+                <p>调查问题</p>
+                <input type="text" class="form-control question" name="question" id="">
+                <p>问题类型</p>
+
+                <select name="answer_type" class="form-control type_list selecter">
+
+
+                </select>
+                <input type="button" class="kk" value="增加" class="btn-primary btn del hide">
+            </div>
+
+
+
             <div style="margin-top: 20px;">
                 <hr>
                 <input type="button" id="sure" value="添加调查问卷" class="btn-primary btn button_list"> |
                 <input type="submit" name="" id="" value="生成调查问卷" class="btn-primary btn ">
                 <input type="button" id="sure" value="删除" class="btn-primary btn del hide">
             </div>
+
+
 
         </form>
 
@@ -43,19 +71,56 @@
 
 
 <script>
-        (function () {
-            var $option=$('<option>')
-            $option.text('请选择')
-            $('#selecter').append($option)
-        })()
+        count=0;
+
+        $(function () {
+            $('.option_list [name]').each(function () {
+                var name = $(this).attr('name');
+                $(this).attr('name',name+'-'+count)
+                }
+            );
+            $('.single-option [name]').each(function () {
+                var name=$(this).attr('name')
+                $(this).attr('name',name+'-'+count)
+            })
+
+        });
 
 
-        $("#sure").click(function () {
-            var copyl=$(this).parent().prev().clone()
-            copyl.find('.kkkk').remove()
-            $(this).parent().before(copyl);
 
+
+        $("#sure").click(function (index) {
+
+            var $copy2=$('.option_list[hidden]').clone()
+            $copy2.removeAttr('hidden')
+
+            count+=1
+            $copy2.each(function () {
+                var name = $(this).children('input').attr('name').split('-')[0]
+{#                console.log($(this).children('input').attr('name'))#}
+                var name1 = $(this).children('select').attr('name').split('-')[0]
+                $(this).children('input').attr('name',name+'-'+count)
+
+                $(this).children('select').attr('name',name1+'-'+count)
+
+            })
+{#            var $ul=$('.option_list').find('.kkkk')#}
+{#            console.log($ul.html())#}
+
+
+            $(this).parent().before($copy2)
+            $copy2.find('.kkkk').remove()
             $(this).next().next().removeClass('hide')
+
+            var $copy1=$('.single-option[hidden]')
+            $copy1.find('input').each(function () {
+                var name=$(this).attr('name').split('-')[0]
+                console.log(name)
+                $(this).attr('name',name+'-'+count)
+
+            })
+
+
         });
 
 
@@ -71,69 +136,114 @@
                 type:'GET',
                 data:{},
                 success:function (response) {
-{#                    alert(234234)#}
-{#                    console.log(response.status_choices);#}
+
                     initselect(response.status_choices)
+
                 }
             })
         });
 
+{#        function initstable(survery) {#}
+{#            console.log(survery)#}
+{#        }#}
+
         function initselect(choice_dict) {
             $.each(choice_dict,function (name,values) {
+
                 var $option=$('<option>');
                 $option.text(values[1]);
+                $option.attr('name',values[1])
                 $option.val(values[0]);
                 $('.selecter').append($option);
             })
 
         }
 
-        $('.row').on('change','.selecter',function () {
-            var $values=$('.selecter option:selected').val();
-                alert($values)
-            if ($values=='score'){
-                var $ul=$('<ul>');
-                var $li=$('<li>');
-                var $input=$('<input>');
-                var $input2=$('<input>');
-                $input.attr('type','text');
-                $li.append('内容:').append($input);
-                $li.append('分值:').append($input2);
-                $ul.append($li);
-                $(this).after($ul)
-
-            }
+           $('.row').on('click','.kk',function () {
+                var values=$(this).prev().val()
+               if (values == 'single') {
+                    var $copy1=$('.single-option[hidden]').clone()
+                   $copy1.removeAttr('hidden')
+                   $(this).after($copy1)
+                }
+        })
 
 
-        });
-
-{#        $('.row').on('click','.kk',function () {#}
-{#                console.log($(this).prev().val())#}
-{#            if ($(this).prev().val()=='single'){#}
+{#        $('.row').on('change','.selecter',function () {#}
+{#            var $values=$('.selecter option:selected').val();#}
+{#                alert($values)#}
+{#            if ($values=='score'){#}
 {#                var $ul=$('<ul>');#}
-{#                $ul.attr('class','kkkk')#}
-{##}
 {#                var $li=$('<li>');#}
 {#                var $input=$('<input>');#}
 {#                var $input2=$('<input>');#}
 {#                $input.attr('type','text');#}
-{#                $li.append('内容').append($input);#}
-{#                $li.append('分值').append($input2);#}
+{#                $li.append('内容:').append($input);#}
+{#                $li.append('分值:').append($input2);#}
 {#                $ul.append($li);#}
 {#                $(this).after($ul)#}
+{##}
 {#            }#}
-{#            else if($(this).prev().val()=='score'){#}
+{##}
+{##}
+{#        });#}
+
+{#        $('.row').on('click','.kk',function () {#}
+{#                console.log($(this).prev().val())#}
+{#            if ($(this).prev().val()=='single'){#}
+{#                var $name=$(this).prev().val()#}
 {##}
 {#                var $ul=$('<ul>');#}
 {#                $ul.attr('class','kkkk')#}
 {#                var $li=$('<li>');#}
 {#                var $input=$('<input>');#}
+{#                var $input2=$('<input>');#}
+{#                var $input3=$('<input>');#}
+{#                $input.attr('name',$name)#}
+{#                $input2.attr('type','number')#}
+{#                $input2.attr('name','score')#}
+{#                $input3.attr('type','button')#}
+{#                $input3.attr('class','buttons')#}
 {#                $input.attr('type','text');#}
+{#                $li.append('内容').append($input);#}
+{#                $li.append('分值').append($input2).append($input3);#}
+{#                $ul.append($li);#}
+{#                $(this).after($ul)#}
+{#                $('.kkkk').children('li').each(function () {#}
+{#                     count+=1#}
+{#                     var name = $(this).find('input').attr('name')#}
+{#                    $(this).find('input').attr('name',name+'-'+count)#}
+{#                     var name1 = $(this).find('input2').attr('name')#}
+{#                    $(this).find('input2').attr('name',name1+'-'+count)#}
+{#                })#}
+{#                $('.kkkk').each(function () {#}
+{#                    count+=1#}
+{#                     var name = $(this).find('input').attr('name')#}
+{#                    $(this).find('input').attr('name',name+'-'+count)#}
+{#                     var name1 = $(this).find('input2').attr('name')#}
+{#                    $(this).find('input2').attr('name',name1+'-'+count)#}
+{#                })#}
+{#            }#}
+{#            else if($(this).prev().val()=='score'){#}
+{#                var $name=$(this).prev().val()#}
+{#                var $ul=$('<ul>');#}
+{#                $ul.attr('class','kkkk')#}
+{#                var $li=$('<li>');#}
+{#                var $input=$('<input>');#}
+{#                $input.attr('type','text');#}
+{#                $input.attr('name',$name+'-'+count);#}
 {#                $li.append('分值').append($input);#}
 {#                $ul.append($li);#}
 {#                $(this).after($ul)#}
 {#            }#}
-{#        })#}
+{#        });#}
+
+
+
+
+        $('.row').on('click','.buttons',function () {
+            $(this).parent().parent().remove()
+        })
 
 
 
